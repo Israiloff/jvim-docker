@@ -28,6 +28,7 @@ RUN apk add --no-cache --no-interactive npm
 RUN apk add --no-cache --no-interactive yarn
 RUN apk add --no-cache --no-interactive neovim
 RUN apk add --no-cache --no-interactive zsh
+RUN apk add --no-cache --no-interactive g++
 
 #CHANGING DEFAULT SHELL TO ZSH
 SHELL ["/bin/zsh", "-c"]
