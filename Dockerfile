@@ -41,4 +41,8 @@ RUN git config --global alias.pushall '!f() { for remote in $(git remote); do gi
 #INSTALLING DOCKER
 RUN apk add --no-cache docker
 
+#INSTALLING JVIM
+RUN mkdir -p ~/.config/nvim
+RUN git clone https://github.com/Israiloff/jvim.git ~/.config/nvim
+
 ENTRYPOINT ["/bin/zsh"]
