@@ -22,6 +22,7 @@ RUN apk add --no-cache --no-interactive openjdk${JDK_VERSION}
 RUN apk add --no-cache --no-interactive maven
 RUN apk add --no-cache --no-interactive git
 RUN apk add --no-cache --no-interactive npm
+RUN apk add --no-cache --no-interactive yarn
 RUN apk add --no-cache --no-interactive neovim
 
 RUN apk add --no-cache --no-interactive zsh
