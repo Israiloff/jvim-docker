@@ -1,4 +1,6 @@
-FROM israiloff/alpine-docker:latest
+ARG PYTHON_VERSION
+
+FROM python:${PYTHON_VERSION}-alpine
 
 ARG JDK_VERSION
 ARG TIMEZONE
@@ -10,6 +12,7 @@ ENV TZ=${TIMEZONE}
 RUN apk add --no-cache bash
 RUN apk update --no-cache
 RUN apk upgrade --no-cache
+
 
 #CHANGING DEFAULT SHELL
 SHELL ["/bin/bash", "-c"]
@@ -24,7 +27,6 @@ RUN apk add --no-cache --no-interactive git
 RUN apk add --no-cache --no-interactive npm
 RUN apk add --no-cache --no-interactive yarn
 RUN apk add --no-cache --no-interactive neovim
-
 RUN apk add --no-cache --no-interactive zsh
 
 #CHANGING DEFAULT SHELL TO ZSH
@@ -40,6 +42,8 @@ RUN echo "export SHELL=/bin/zsh" >> $HOME/.zshrc
 RUN git config --global alias.pushall '!f() { for remote in $(git remote); do git push "$remote" "$@"; done; }; f'
 
 #INSTALLING DOCKER
+RUN apk add --update docker openrc
+RUN rc-update add docker boot
 RUN apk add --no-cache docker
 
 #INSTALLING JVIM
