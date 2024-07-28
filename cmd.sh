@@ -1,4 +1,4 @@
-BUILD_VERSION=0.0.1
+BUILD_VERSION=0.0.2
 docker build \
             --build-arg JDK_VERSION=21 \
 			--build-arg PYTHON_VERSION=3 \
