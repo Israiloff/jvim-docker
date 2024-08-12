@@ -33,6 +33,7 @@ RUN apk add --no-cache --no-interactive libc6-compat
 RUN apk add --no-cache --no-interactive gcc
 RUN apk add --no-cache --no-interactive g++
 RUN apk add --no-cache --no-interactive make
+RUN apk add --no-cache --no-interactive cargo
 
 #CHANGING DEFAULT SHELL TO ZSH
 SHELL ["/bin/zsh", "-c"]
