@@ -54,7 +54,7 @@ RUN apk add --no-cache docker
 
 #INSTALLING JVIM
 RUN mkdir -p ~/.config/nvim
-RUN git clone --depth 1 --branch 0.12.24 https://github.com/Israiloff/jvim.git ~/.config/nvim
+RUN git clone --depth 1 --branch master https://github.com/Israiloff/jvim.git ~/.config/nvim
 RUN nvim --headless "+Lazy! sync" +qa
 
 ENTRYPOINT ["/bin/zsh"]
