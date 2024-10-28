@@ -58,7 +58,6 @@ RUN git clone --depth 1 --branch master https://github.com/Israiloff/jvim.git ~/
 RUN nvim --headless "+Lazy! sync" +qa
 
 #REPAIRING MARKDOWN PREVIEW
-RUN apk add --no-cache --no-interactive yarn
 RUN cd $HOME/.local/share/lunarvim/site/pack/lazy/opt/markdown-preview.nvim && yarn install
 
 ENTRYPOINT ["/bin/zsh"]
