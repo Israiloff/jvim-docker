@@ -60,4 +60,8 @@ RUN nvim --headless "+Lazy! sync" +qa
 #REPAIRING MARKDOWN PREVIEW
 RUN cd $HOME/.local/share/lunarvim/site/pack/lazy/opt/markdown-preview.nvim && yarn install
 
+#SETTING UP ZSH SYNTAX HIGHLIGHTING
+RUN apk add --no-cache --no-interactive zsh-syntax-highlighting
+RUN echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> $HOME/.zshrc
+
 ENTRYPOINT ["/bin/zsh"]
