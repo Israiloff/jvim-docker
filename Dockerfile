@@ -64,4 +64,8 @@ RUN cd $HOME/.local/share/lunarvim/site/pack/lazy/opt/markdown-preview.nvim && y
 RUN apk add --no-cache --no-interactive zsh-syntax-highlighting
 RUN echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> $HOME/.zshrc
 
+#SETTING UP ZSH AUTOSUGGESTIONS
+RUN apk add --no-cache --no-interactive zsh-autosuggestions
+RUN echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> $HOME/.zshrc
+
 ENTRYPOINT ["/bin/zsh"]
