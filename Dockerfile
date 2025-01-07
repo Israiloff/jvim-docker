@@ -58,7 +58,7 @@ RUN git clone --depth 1 --branch master https://github.com/Israiloff/jvim.git ~/
 RUN nvim --headless "+Lazy! sync" +qa
 
 #REPAIRING MARKDOWN PREVIEW
-RUN cd $HOME/.local/share/lunarvim/site/pack/lazy/opt/markdown-preview.nvim && yarn install
+RUN cd $HOME/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
 
 #SETTING UP ZSH SYNTAX HIGHLIGHTING
 RUN apk add --no-cache --no-interactive zsh-syntax-highlighting
