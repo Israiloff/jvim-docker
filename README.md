@@ -48,7 +48,7 @@ To persist your projects and configurations, mount your local directories:
 docker run -it --network host --name jvim \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /usr/local/bin/docker:/usr/local/bin/docker \
-  -v $(pwd)/projects:/root/projects \
+  -v $(pwd):/root/project \
   israiloff/jvim
 ```
 
@@ -135,7 +135,7 @@ This Docker image includes a comprehensive set of tools and configurations optim
 ### Starting a New Java Project
 
 ```bash
-# Run the container
+# Run the container (without Docker-in-Docker for simple Java projects)
 docker run -it --name jvim -v $(pwd):/root/project israiloff/jvim
 
 # Inside the container, create a new Maven project
@@ -146,16 +146,20 @@ cd my-app
 nvim
 ```
 
+> **Note**: If you need Docker-in-Docker functionality, add the Docker socket mounts: `-v /var/run/docker.sock:/var/run/docker.sock -v /usr/local/bin/docker:/usr/local/bin/docker`
+
 ### Working with Existing Projects
 
 ```bash
-# Mount your existing project directory
+# Mount your existing project directory (add Docker socket mounts if needed)
 docker run -it --name jvim -v /path/to/your/project:/root/project israiloff/jvim
 
 # Inside the container
 cd /root/project
 nvim
 ```
+
+> **Note**: For projects that require Docker-in-Docker (e.g., building container images), add: `-v /var/run/docker.sock:/var/run/docker.sock -v /usr/local/bin/docker:/usr/local/bin/docker`
 
 ### Using Docker Inside the Container
 
