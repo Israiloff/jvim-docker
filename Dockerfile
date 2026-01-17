@@ -35,10 +35,10 @@ RUN apk add --no-cache --no-interactive make
 RUN apk add --no-cache --no-interactive cargo
 
 #INSTALLING NEOVIM LATEST RELEASE
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-RUN tar -C /opt -xzf nvim-linux64.tar.gz
-RUN ln -s /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim
-RUN rm nvim-linux64.tar.gz
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
+    tar -C /opt -xzf nvim-linux64.tar.gz && \
+    ln -s /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim && \
+    rm nvim-linux64.tar.gz
 
 #CHANGING DEFAULT SHELL TO ZSH
 SHELL ["/bin/zsh", "-c"]
