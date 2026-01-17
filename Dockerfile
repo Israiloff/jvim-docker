@@ -35,7 +35,8 @@ RUN apk add --no-cache --no-interactive make
 RUN apk add --no-cache --no-interactive cargo
 
 #INSTALLING NEOVIM LATEST RELEASE
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
+# Note: This installs the x86_64 version. For ARM systems, use nvim-linux-arm64.tar.gz
+RUN curl --fail -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
     tar -C /opt -xzf nvim-linux64.tar.gz && \
     ln -s /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim && \
     rm nvim-linux64.tar.gz
