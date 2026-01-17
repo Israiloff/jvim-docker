@@ -26,7 +26,6 @@ RUN apk add --no-cache --no-interactive maven
 RUN apk add --no-cache --no-interactive git
 RUN apk add --no-cache --no-interactive npm
 RUN apk add --no-cache --no-interactive yarn
-RUN apk add --no-cache --no-interactive neovim
 RUN apk add --no-cache --no-interactive zsh
 RUN apk add --no-cache --no-interactive build-base
 RUN apk add --no-cache --no-interactive libc6-compat
@@ -34,6 +33,12 @@ RUN apk add --no-cache --no-interactive gcc
 RUN apk add --no-cache --no-interactive g++
 RUN apk add --no-cache --no-interactive make
 RUN apk add --no-cache --no-interactive cargo
+
+#INSTALLING NEOVIM LATEST RELEASE
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+RUN tar -C /opt -xzf nvim-linux64.tar.gz
+RUN ln -s /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim
+RUN rm nvim-linux64.tar.gz
 
 #CHANGING DEFAULT SHELL TO ZSH
 SHELL ["/bin/zsh", "-c"]
