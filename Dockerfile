@@ -66,12 +66,13 @@ RUN nvim --headless "+Lazy! sync" +qa
 #REPAIRING MARKDOWN PREVIEW
 RUN cd $HOME/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
 
-#SETTING UP ZSH SYNTAX HIGHLIGHTING
-RUN apk add --no-cache --no-interactive zsh-syntax-highlighting
-RUN echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> $HOME/.zshrc
+#INSTALLING ZSH PLUGINS
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+RUN git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
+RUN git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
 
-#SETTING UP ZSH AUTOSUGGESTIONS
-RUN apk add --no-cache --no-interactive zsh-autosuggestions
-RUN echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> $HOME/.zshrc
+#ENABLING ZSH PLUGINS IN .ZSHRC
+RUN sed -i -e 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)/g' ~/.zshrc
 
 ENTRYPOINT ["/bin/zsh"]
