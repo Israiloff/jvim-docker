@@ -136,7 +136,7 @@ This Docker image includes a comprehensive set of tools and configurations optim
 
 ```bash
 # Run the container
-docker run -it --name jvim -v $(pwd):/root/workspace israiloff/jvim
+docker run -it --name jvim -v $(pwd):/root/project israiloff/jvim
 
 # Inside the container, create a new Maven project
 mvn archetype:generate -DgroupId=com.example -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
@@ -189,9 +189,9 @@ docker build \
 
 ### Build Arguments
 
-- `JDK_VERSION`: Java Development Kit version (default: 21)
-- `PYTHON_VERSION`: Python version (default: 3)
-- `TIMEZONE`: Container timezone (default: Asia/Tashkent)
+- `JDK_VERSION`: Java Development Kit version (default: 21, other options: 11, 17, 21)
+- `PYTHON_VERSION`: Python version (default: 3, other options: 3.9, 3.10, 3.11, 3.12)
+- `TIMEZONE`: Container timezone (default: Asia/Tashkent, any valid timezone from [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))
 
 ## Customization
 
