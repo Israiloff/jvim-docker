@@ -1,78 +1,155 @@
-ARG PYTHON_VERSION
+ARG OS_VERSION=22.04
 
-FROM python:${PYTHON_VERSION}-alpine
+FROM ubuntu:${OS_VERSION}
 
-ARG JDK_VERSION
 ARG TIMEZONE
+ARG JDK_VERSION
+ARG ARCH
 
-RUN apk add --no-cache tzdata
+ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=${TIMEZONE}
 
-#PREPARING OS
-RUN apk add --no-cache bash
-RUN apk update --no-cache
-RUN apk upgrade --no-cache
-
-
-#CHANGING DEFAULT SHELL
 SHELL ["/bin/bash", "-c"]
 
-#INSTALLING COMMONS
-RUN apk add --no-cache --no-interactive zip
-RUN apk add --no-cache --no-interactive unzip
-RUN apk add --no-cache --no-interactive curl
-RUN apk add --no-cache --no-interactive openjdk${JDK_VERSION}
-RUN apk add --no-cache --no-interactive maven
-RUN apk add --no-cache --no-interactive git
-RUN apk add --no-cache --no-interactive npm
-RUN apk add --no-cache --no-interactive yarn
-RUN apk add --no-cache --no-interactive zsh
-RUN apk add --no-cache --no-interactive build-base
-RUN apk add --no-cache --no-interactive libc6-compat
-RUN apk add --no-cache --no-interactive gcc
-RUN apk add --no-cache --no-interactive g++
-RUN apk add --no-cache --no-interactive make
-RUN apk add --no-cache --no-interactive cargo
+# -------------------------
+# Base / timezone
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends tzdata
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime
+RUN echo ${TZ} > /etc/timezone
 
-#INSTALLING NEOVIM LATEST RELEASE
-# Note: This installs the x86_64 version. For ARM systems, use nvim-linux-arm64.tar.gz
-RUN curl --fail -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
-    tar -C /opt -xzf nvim-linux64.tar.gz && \
-    ln -s /opt/nvim-linux64/bin/nvim /usr/local/bin/nvim && \
-    rm nvim-linux64.tar.gz
+# -------------------------
+# Base utilities (each отдельно)
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends ca-certificates
+RUN apt-get install -y --no-install-recommends curl
+RUN apt-get install -y --no-install-recommends git
+RUN apt-get install -y --no-install-recommends bash
+RUN apt-get install -y --no-install-recommends zsh
+RUN apt-get install -y --no-install-recommends zip
+RUN apt-get install -y --no-install-recommends unzip
+RUN apt-get install -y --no-install-recommends gnupg
 
-#CHANGING DEFAULT SHELL TO ZSH
+# -------------------------
+# Python (Ubuntu python3)
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends python3
+RUN apt-get install -y --no-install-recommends python3-pip
+RUN apt-get install -y --no-install-recommends python3-venv
+
+# -------------------------
+# JDK + Maven
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends openjdk-${JDK_VERSION}-jdk
+RUN apt-get install -y --no-install-recommends maven
+
+# -------------------------
+# Build tools / cargo
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential
+RUN apt-get install -y --no-install-recommends gcc
+RUN apt-get install -y --no-install-recommends g++
+RUN apt-get install -y --no-install-recommends make
+RUN apt-get install -y --no-install-recommends cargo
+
+# -------------------------
+# CLI tools
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends ripgrep
+RUN apt-get install -y --no-install-recommends fd-find
+RUN apt-get install -y --no-install-recommends fzf
+
+# fd in Ubuntu is fdfind -> make fd available
+RUN ln -sf /usr/bin/fdfind /usr/local/bin/fd
+
+# -------------------------
+# Node + npm + yarn
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends nodejs
+RUN apt-get install -y --no-install-recommends npm
+RUN npm install -g yarn
+
+# -------------------------
+# Docker CLI (daemon НЕ запускаем внутри build)
+# -------------------------
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends docker.io
+
+# -------------------------
+# Install Neovim (latest) from GitHub releases
+# -------------------------
+RUN rm -rf /opt/nvim
+RUN mkdir -p /opt
+
+# Download archive depending on ARCH
+RUN if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then \
+    echo "Downloading Neovim latest for arm64"; \
+    curl -fL -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-arm64.tar.gz; \
+    elif [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86_64" ]; then \
+    echo "Downloading Neovim latest for amd64"; \
+    curl -fL -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz; \
+    else \
+    echo "Unsupported ARCH=${ARCH} (use arm64 or amd64)"; \
+    exit 1; \
+    fi
+
+RUN tar -xzf /tmp/nvim.tar.gz -C /opt
+RUN rm -f /tmp/nvim.tar.gz
+
+# Create stable path /opt/nvim -> extracted dir
+RUN if [ -d /opt/nvim-linux-arm64 ]; then ln -s /opt/nvim-linux-arm64 /opt/nvim; fi
+RUN if [ -d /opt/nvim-linux-x86_64 ]; then ln -s /opt/nvim-linux-x86_64 /opt/nvim; fi
+
+RUN ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+RUN nvim --version
+
+# -------------------------
+# Oh My Zsh (non-interactive)
+# -------------------------
 SHELL ["/bin/zsh", "-c"]
 
-#INSTALLING AND CONFIGURING OH MY ZSH
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-RUN sed -i -e 's/ZSH_THEME="robbyrussell"/ZSH_THEME="half-life"/g' ~/.zshrc
-RUN apk add --no-cache --no-interactive zsh-vcs
-RUN echo "export SHELL=/bin/zsh" >> $HOME/.zshrc
+RUN export RUNZSH=no
+RUN export CHSH=no
+RUN export KEEP_ZSHRC=yes
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-#GIT CONFIGS
+RUN sed -i -e 's/ZSH_THEME="robbyrussell"/ZSH_THEME="half-life"/g' ~/.zshrc
+RUN echo "export SHELL=/bin/zsh" >> ~/.zshrc
+
+# -------------------------
+# Git config
+# -------------------------
 RUN git config --global alias.pushall '!f() { for remote in $(git remote); do git push "$remote" "$@"; done; }; f'
 
-#INSTALLING DOCKER
-RUN apk add --update docker openrc
-RUN rc-update add docker boot
-RUN apk add --no-cache docker
-
-#INSTALLING JVIM
+# -------------------------
+# Install JVIM
+# -------------------------
 RUN mkdir -p ~/.config/nvim
+RUN rm -rf ~/.config/nvim
 RUN git clone --depth 1 --branch master https://github.com/Israiloff/jvim.git ~/.config/nvim
+
+# Lazy sync (headless)
 RUN nvim --headless "+Lazy! sync" +qa
 
-#REPAIRING MARKDOWN PREVIEW
-RUN cd $HOME/.local/share/nvim/lazy/markdown-preview.nvim && yarn install
+# markdown-preview.nvim deps
+RUN cd $HOME/.local/share/nvim/lazy/markdown-preview.nvim
+RUN yarn install
 
-#INSTALLING ZSH PLUGINS
+# -------------------------
+# Zsh plugins
+# -------------------------
 RUN git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 RUN git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 RUN git clone --depth 1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
 RUN git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
 
-#ENABLING ZSH PLUGINS IN .ZSHRC
 RUN sed -i -e 's/^plugins=([^)]*)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)/g' ~/.zshrc
 
 ENTRYPOINT ["/bin/zsh"]
