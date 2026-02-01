@@ -3,28 +3,17 @@ JDK_VERSION=21
 OS_VERSION=24.04
 PYTHON_VERSION=3
 TIMEZONE=Asia/Tashkent
-ARCH_ARM64=arm64
-ARCH_AMD64=amd64
 
-docker buildx build --platform linux/$ARCH_ARM64 \
-            --build-arg JDK_VERSION=$JDK_VERSION \
-            --build-arg OS_VERSION=$OS_VERSION \
-			--build-arg PYTHON_VERSION=$PYTHON_VERSION \
-            --build-arg TIMEZONE=$TIMEZONE \
-            --build-arg ARCH=$ARCH_ARM64 \
-            -t israiloff/jvim:$BUILD_VERSION-$ARCH_ARM64 .
-docker tag israiloff/jvim:$BUILD_VERSION-$ARCH_ARM64 israiloff/jvim:latest-$ARCH_ARM64
+docker buildx create --name multiarch --use 2>/dev/null || docker buildx use multiarch
+docker buildx inspect --bootstrap
 
-docker buildx build --platform linux/$ARCH_AMD64 \
-            --build-arg JDK_VERSION=$JDK_VERSION \
-            --build-arg OS_VERSION=$OS_VERSION \
-            --build-arg PYTHON_VERSION=$PYTHON_VERSION \
-            --build-arg TIMEZONE=$TIMEZONE \
-            --build-arg ARCH=$ARCH_AMD64 \
-            -t israiloff/jvim:$BUILD_VERSION-$ARCH_AMD64 .
-docker tag israiloff/jvim:$BUILD_VERSION-$ARCH_AMD64 israiloff/jvim:latest-$ARCH_AMD64 israiloff/jvim:latest
-
-docker push israiloff/jvim:$BUILD_VERSION-$ARCH_ARM64
-docker push israiloff/jvim:latest-$ARCH_ARM64
-docker push israiloff/jvim:$BUILD_VERSION-$ARCH_AMD64
-docker push israiloff/jvim:latest-$ARCH_AMD64
+docker buildx build \
+  --platform linux/arm64,linux/amd64 \
+  --build-arg JDK_VERSION=$JDK_VERSION \
+  --build-arg OS_VERSION=$OS_VERSION \
+  --build-arg PYTHON_VERSION=$PYTHON_VERSION \
+  --build-arg TIMEZONE=$TIMEZONE \
+  -t israiloff/jvim:$BUILD_VERSION \
+  -t israiloff/jvim:latest \
+  --push \
+  .

@@ -89,14 +89,21 @@ RUN rm -rf /opt/nvim
 RUN mkdir -p /opt
 
 # Download archive depending on ARCH
-RUN if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then \
+# BuildKit automatically provides these
+ARG TARGETARCH
+
+RUN echo "Building for TARGETARCH=${TARGETARCH}"
+
+RUN if [ "${TARGETARCH}" = "arm64" ]; then \
     echo "Downloading Neovim latest for arm64"; \
-    curl -fL -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-arm64.tar.gz; \
-    elif [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86_64" ]; then \
+    curl -fL -o /tmp/nvim.tar.gz \
+    https://github.com/neovim/neovim/releases/latest/download/nvim-linux-arm64.tar.gz; \
+    elif [ "${TARGETARCH}" = "amd64" ]; then \
     echo "Downloading Neovim latest for amd64"; \
-    curl -fL -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz; \
+    curl -fL -o /tmp/nvim.tar.gz \
+    https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz; \
     else \
-    echo "Unsupported ARCH=${ARCH} (use arm64 or amd64)"; \
+    echo "Unsupported TARGETARCH=${TARGETARCH}"; \
     exit 1; \
     fi
 
